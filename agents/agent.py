@@ -1,48 +1,34 @@
-from tools import TOOLS_SCHEMA, names_to_functions
-from mistralai import Mistral
-from dotenv import load_dotenv
-import os, json
+from llm_client import LLMClient
 
-load_dotenv()
-api_key = os.environ['MISTRAL_API_KEY']
-model = "mistral-large-latest"
-client = Mistral(api_key = api_key)
 
-print(json.dumps(TOOLS_SCHEMA, indent = 4))
+model = "codestral-2508"
+llm = LLMClient(model=model)
 
 messages = [{
     'role' : 'assistant',
     'content': 'I am your assistant, how can I help ? [EXIT] for exit\n'
 }]
 
-usr_input : str = input('I am your assistant, how can I help ? [EXIT] for exit\n')
+def main():
+    usr_input : str = input('I am your assistant, how can I help ? [EXIT] for exit\n')
 
-while usr_input != '[EXIT]':
-    
-    usr_message = {
-        'role':'user',
-        'content': usr_input
-    }
+    while usr_input != '[EXIT]':
+        
+        usr_message = {
+            'role':'user',
+            'content': usr_input
+        }
 
-    messages.append(usr_message)
+        messages.append(usr_message)
 
+        llm_resp = llm.generate(messages=messages, use_tools=True)
 
-    chat_response = client.chat.complete(
-        model = model,
-        messages = messages,
-        tools = TOOLS_SCHEMA,
-        tool_choice = "any",
+        usr_input=input(llm_resp+ '[EXIT] for exit\n')
 
-    )
+        messages.append({
+            'role':'assistant',
+            'content' : llm_resp
+        })
 
-    llm_resp = chat_response.choices[0].message.content
-
-    print(chat_response)
-
-    usr_input=input(llm_resp+ '[EXIT] for exit\n')
-
-    messages.append({
-        'role':'assistant',
-        'content' : llm_resp
-    })
-
+if __name__ == '__main__':
+    main()

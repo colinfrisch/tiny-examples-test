@@ -13,12 +13,14 @@ users_favorite_games = {
 
 def weather_tool(city: str) -> str:
     """Get the weather of a city"""
-    print("using weather_tool")
+    city = city.lower()
     return f"The weather of {city} is sunny"
 
 def get_user_favorite_game(user: str) -> str:
     """Get the favorite game of a user"""
-    print("using get_user_favorite_game")
+    user = user.lower()
+    if user not in users_favorite_games:
+        return "User not found"
     return users_favorite_games[user]
 
 # -- Set tool schema -- 
